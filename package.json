@@ -1,0 +1,22 @@
+{
+  "name": "mpegts-websocket-poc",
+  "version": "1.0.0",
+  "description": "mpeg transport streams to the browser",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/esonderegger/mpegts-websocket-poc.git"
+  },
+  "author": "Evan Sonderegger",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/esonderegger/mpegts-websocket-poc/issues"
+  },
+  "homepage": "https://github.com/esonderegger/mpegts-websocket-poc#readme",
+  "dependencies": {
+    "ws": "^7.3.0"
+  }
+}

@@ -1,0 +1,1 @@
+This file exists just to create a segments folder in the git repo. I'm sure there is a better way.

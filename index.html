@@ -1,0 +1,75 @@
+<html>
+<head>
+<title>MPEG-TS Websocket demo</title>
+</head>
+<body>
+<h1>MPEG-TS Websocket demo</h1>
+<div>
+    <button id="starter">Connect</button>
+</div>
+<video id="livestream" width="640" height="360"></video>
+<div>
+    <pre id="debug"></pre>
+</div>
+<script src="https://github.com/videojs/mux.js/releases/latest/download/mux.js"></script>
+<script>
+const mime = 'video/mp4; codecs="avc1.64001E, mp4a.40.2"';
+const mediaSource = new MediaSource();
+const transmuxer = new muxjs.mp4.Transmuxer();
+const video = document.getElementById('livestream');
+const debugNode = document.getElementById('debug');
+
+let initRequired = true;
+let sourceBuffer = null;
+const queue = [];
+
+function chunkToBuffer(segment, firstSegment) {
+  if (firstSegment) {
+    const bytes = new Uint8Array(segment.initSegment.byteLength + segment.data.byteLength);
+    bytes.set(segment.initSegment, 0);
+    bytes.set(segment.data, segment.initSegment.byteLength);
+    return bytes;
+  } else {
+    return new Uint8Array(segment.data);
+  }
+}
+
+transmuxer.on('data', (segment) => {
+  queue.push(segment);
+  const parsed = muxjs.mp4.tools.inspect(segment.data);
+  debugNode.innerText = muxjs.mp4.tools.textify(parsed);
+  sendQueueToBuffer();
+  initRequired = false;
+});
+
+function initMediaSource() {
+  if (initRequired) {
+    sourceBuffer = mediaSource.addSourceBuffer(mime);
+    sourceBuffer.addEventListener('updateend', sendQueueToBuffer);
+    video.play();
+  }
+}
+
+function sendQueueToBuffer() {
+  if (queue.length > 0 && !sourceBuffer.updating) {
+    const chunk = queue.shift();
+    sourceBuffer.appendBuffer(chunkToBuffer(chunk, initRequired));
+  }
+}
+
+function playFromSocket() {
+  mediaSource.addEventListener("sourceopen", initMediaSource);
+  video.src = URL.createObjectURL(mediaSource);
+  const websocket = new WebSocket('ws://localhost:8000');
+  websocket.binaryType = 'arraybuffer';
+  websocket.addEventListener('message', function(e) {
+    transmuxer.push(new Uint8Array(e.data));
+    transmuxer.flush();
+  }, false);
+}
+
+const starterButton = document.getElementById('starter');
+starterButton.addEventListener('click', playFromSocket);
+</script>
+</body>
+</html>

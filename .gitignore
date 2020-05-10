@@ -102,3 +102,7 @@ dist
 
 # TernJS port file
 .tern-port
+
+# HLS files
+segments/*.ts
+segments/*.m3u8
