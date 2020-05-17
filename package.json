@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/esonderegger/mpegts-websocket-poc#readme",
   "dependencies": {
+    "mux.js": "^5.6.3",
     "ws": "^7.3.0"
   }
 }
